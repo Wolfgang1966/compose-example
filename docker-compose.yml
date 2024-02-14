@@ -1,0 +1,44 @@
+version: '3.2'
+
+# This example starts a database, prepares some test data, 
+# runs some kind of test and finally shuts down the database
+
+services:
+  test-database:
+    image: mariadb:latest 
+    environment:
+      MARIADB_ROOT_PASSWORD: "ganzgeheim"
+      MARIADB_PASSWORD: "geheim"
+      MARIADB_USER: "testuser"
+      MARIADB_DATABASE: "testdb"
+    container_name: mytest
+    ports:
+      - "3306:3306"
+
+  prepare:
+    image: prepare:latest
+    build:
+      context: prepare
+    depends_on:
+      test-database:
+        condition: service_started
+    network_mode: service:test-database
+
+  test-app:
+    image: test-app
+    build:
+      context: testapp
+    depends_on:
+      prepare:
+        condition: service_completed_successfully
+    network_mode: service:test-database
+
+  shutdown:
+    image: shutdown:latest
+    build:
+      context: shutdown
+    depends_on:
+      test-app:
+        condition: service_completed_successfully
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
