@@ -1,4 +1,6 @@
 #!/bin/bash
+echo waiting for db preparation ...
+sleep 15
 echo starting test
 mariadb  -h 127.0.0.1 -u $DBUSER --password=${DBPW} ${DB} <<_EOF
 select * from mytest;

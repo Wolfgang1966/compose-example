@@ -1,2 +1,2 @@
 FROM docker:cli
-CMD docker stop mytest
+CMD sleep 20; docker stop mytest
